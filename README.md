@@ -10,13 +10,21 @@ There are 115 observations of 9 variables. The dataset was already cleaned.
 _Variables:_
 
 AGE: Age of client (Quantitative)
+
 GENDER: Gender of client (Categorical--male, female) 
+
 completed: Has the client complete the shelter’s program (Indicator)
+
 VETERAN: Is the client a veteran (Indicator)
+
 assistance_type: Temporary or permanent assistance (Indicator)
+
 INCOME: Annual income of client (Quantitative)
+
 substanceabuse: Does the client have substance abuse (Indicator)
+
 probation: Is the client on probation (Indicator)
+
 NIGHTS: Number of nights the client has stayed at the shelter (Quantitative)
 
 **Analysis 1: Difference in Means via T-Test**
