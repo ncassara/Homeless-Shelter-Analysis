@@ -1,5 +1,5 @@
 # Homeless-Shelter-Analysis
-Final project for my "Applied Statistical Methods" class. The project required to do 3 different analyses, one being a difference in means, another being a categorical analysis, and the last being a regression analysis. This class assumes introductory statistics knowledge, so we focused on assumption exploration and how to approach an analysis when assumptions are not met.
+Final project for my "Applied Statistical Methods" class. The project required to do 3 different analyses in R, one being a difference in means, another being a categorical analysis, and the last being a regression analysis. This class assumes introductory statistics knowledge, so we focused on assumption exploration and how to approach an analysis when assumptions are not met.
 
 **Background Information**
 
