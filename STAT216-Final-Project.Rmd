@@ -1,0 +1,160 @@
+---
+title: "STAT216-Final-Project"
+author: "Nicole Cassara"
+date: "2023-12-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE)
+```
+
+Load in the dataset and store as object shelter:
+```{r}
+shelter <- read.csv("HomelessShelter.csv")
+summary(shelter)
+```
+
+**Case QC Analysis: Age and Gender Analysis**
+
+Age: Quantitative Variable
+Gender: 
+```{r}
+#T-test to compare mean age between different genders
+t.test(AGE ~ GENDER, data = shelter)
+
+#ANOVA to test for significant age differences across different gender categories
+anova(aov(AGE ~ GENDER, data = shelter))
+
+```
+
+
+$H_0$: There is no significant difference in the mean age between different genders among shelter-seekers.  
+$H_1$: There is a significant difference in the mean age between at least two gender categories among shelter-seekers.
+
+$H_0: \mu_M - \mu_F = 0$  
+$H_1: \mu_M - \mu_F \ne 0$  
+
+
+*ANOVA Hypotheses:*
+
+$H_0$: There is no significant difference in the mean age across different gender categories among shelter-seekers.
+
+$H_1$: There is a significant difference in the mean age across at least two gender categories among shelter-seekers.
+
+Normality Assumption visualization using ggplot:
+```{r}
+library(ggplot2)
+
+#Histogram and QQ plot for age within each gender category
+ggplot(shelter, aes(x = AGE, fill = GENDER)) +
+  geom_histogram(position = "identity", bins = 30, alpha = 0.7) +
+  facet_wrap(~GENDER, scales = "free") +
+  ggtitle("Distribution of Age by Gender") +
+  xlab("Age") +
+  ylab("Frequency")
+
+#QQ plot
+ggplot(shelter, aes(sample = AGE, color = GENDER)) +
+  stat_qq() +
+  stat_qq_line() +
+  ggtitle("Q-Q Plot of Age by Gender") +
+  xlab("Theoretical Quantiles") +
+  ylab("Sample Quantiles")
+
+#Formal test for normality (Shapiro-Wilk test for each gender category)
+shapiro_test_result <- by(shelter$AGE, shelter$GENDER, shapiro.test)
+print(shapiro_test_result)
+```
+
+Using base R
+```{r}
+# Histogram for age within each gender category
+par(mfrow=c(1, 2))
+hist(shelter$AGE[shelter$GENDER == "Male"], main="Histogram - Male", xlab="Age", col="lightgreen")
+hist(shelter$AGE[shelter$GENDER == "Female"], main="Histogram - Female", xlab="Age", col="purple")
+
+#QQ plot
+par(mfrow=c(1, 1))
+qqnorm(shelter$AGE)
+qqline(shelter$AGE)
+
+table(shelter$GENDER)
+
+shapiro.test(shelter$AGE[shelter$GENDER == "Male"])
+shapiro.test(shelter$AGE[shelter$GENDER == "Female"])
+
+#round(stat.desc(x=shelter$AGE, norm=TRUE), 3)
+```
+
+Homogeniety of Variance
+```{r}
+library(car)
+leveneTest(shelter$AGE, shelter$GENDER)
+```
+
+Wilcox Rank Sum Test:
+```{r}
+wilcox.test(AGE ~ GENDER, data = shelter)
+```
+
+Case CC-Substance Abuse and Probation Status
+Chi-Sq Test of Independence
+
+Binary: 1 is true, 0 is false
+
+$H_0$: Probation status and substance abuse are independent
+
+$H_1$: Probation status and substance abuse are associated
+
+$H_0: p_1 - p_2 = 0$  
+$H_1: p_1 - p_2 \ne 0$  
+
+```{r}
+tab1 <- table(shelter$probation, shelter$substanceabuse)
+tab1
+
+chisq.test(tab1, correct = F)
+```
+**With a p-value of 0.03481, which is below our alpha of 0.05, we can reject our null. We have sufficient evidence to conclude that substance abuse and probation status are associated.**
+
+
+Case QQ: Regression
+```{r}
+lm1 <- lm(NIGHTS ~ AGE, data = shelter)
+summary(lm1)
+
+plot(shelter$NIGHTS ~ shelter$AGE)
+abline(lm1) #plots the regression line
+
+##the line is y = 264.2178 - 3.9619x
+
+##The intercept, 264.2178, is the expected value of y (nights) when x (age) equals 0.
+
+##The slope, -3.9619, is the expected change in y (nights) for 1 unit increase in x (age).
+
+##Coefficient of Determination: 0.4053
+```
+
+
+```{r}
+shapiro.test(shelter$AGE)
+shapiro.test(shelter$INCOME)
+
+hist(shelter$AGE)
+hist(shelter$INCOME)
+
+qqnorm(shelter$AGE, pch = 1, frame = FALSE)
+qqline(shelter$AGE, col = "steelblue", lwd = 2)
+
+qqnorm(shelter$INCOME, pch = 1, frame = FALSE)
+qqline(shelter$INCOME, col = "steelblue", lwd = 2)
+```
+Case QQ+
+```{r}
+shelter$GENDER <- as.factor(shelter$GENDER)
+shelter$VETERAN <- as.factor(shelter$VETERAN)
+
+lm1 <- lm(INCOME ~ AGE + GENDER + VETERAN + NIGHTS + substanceabuse + completed + probation + assistance_type, data = shelter)
+summary(lm1)
+```
